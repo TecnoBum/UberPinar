@@ -4,53 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#10b981">
-    <title>UberPinar | Transporte Ecológico</title>
+    <title>UberPinar | Transporte</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase (opcional - para multi-dispositivo) -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <style>
         :root {
             --primary: #10b981;
             --primary-dark: #059669;
             --secondary: #000000;
-            --accent: #276EF1;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
             --bg: #f0fdf4;
             --white: #ffffff;
             --gray-100: #f0fdf4;
             --gray-200: #bbf7d0;
-            --gray-300: #86efac;
             --gray-500: #6b7280;
             --gray-700: #374151;
             --gray-900: #111827;
+            --danger: #ef4444;
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            -webkit-tap-highlight-color: transparent; 
-            font-family: 'Inter', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
         
-        body { 
-            background: var(--bg); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow-x: hidden;
-        }
+        body { background: var(--bg); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-        /* ==================== HEADER ==================== */
+        /* HEADER */
         header { 
             background: var(--white); 
             padding: 0.8rem 1rem; 
@@ -58,17 +37,12 @@
             justify-content: space-between; 
             align-items: center; 
             border-bottom: 2px solid var(--gray-200); 
-            z-index: 100;
-            box-shadow: var(--shadow);
             position: sticky;
             top: 0;
+            z-index: 100;
         }
         
-        .logo { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-        }
+        .logo { display: flex; align-items: center; gap: 10px; }
         
         .logo-icon {
             width: 45px;
@@ -79,48 +53,13 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
         }
         
-        .logo-icon::before {
-            content: '🍃';
-            font-size: 1.8rem;
-            position: absolute;
-            top: -2px;
-        }
+        .logo-icon::before { content: '🍃'; font-size: 1.8rem; position: absolute; top: -2px; }
+        .logo-icon::after { content: '🛺'; font-size: 1.4rem; position: relative; z-index: 1; }
         
-        .logo-icon::after {
-            content: '🛺';
-            font-size: 1.4rem;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .logo-text { 
-            font-weight: 800; 
-            font-size: 1.3rem; 
-            color: var(--gray-900);
-        }
-        
-        .logo-text span {
-            color: var(--primary);
-        }
-        
-        .header-actions { display: flex; align-items: center; gap: 10px; }
-        
-        .status-badge { 
-            font-size: 0.65rem; 
-            padding: 4px 10px; 
-            border-radius: 12px; 
-            font-weight: 600; 
-            background: var(--gray-200); 
-            color: var(--gray-700);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .status-badge.online { background: #dcfce7; color: #166534; }
-        .status-badge.local { background: #fef3c7; color: #92400e; }
+        .logo-text { font-weight: 800; font-size: 1.3rem; color: var(--gray-900); }
+        .logo-text span { color: var(--primary); }
         
         .btn-icon { 
             background: var(--gray-100); 
@@ -132,30 +71,19 @@
             border-radius: 12px;
             min-width: 40px;
             min-height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
-        .btn-icon:hover { background: var(--gray-200); }
 
-        /* ==================== VISTAS ==================== */
-        .view { 
-            display: none; 
-            flex: 1; 
-            flex-direction: column; 
-            min-height: calc(100vh - 65px); 
-            overflow: hidden; 
-        }
+        /* VISTAS */
+        .view { display: none; flex: 1; flex-direction: column; min-height: calc(100vh - 65px); }
         .view.active { display: flex; }
 
-        /* ==================== PASAJERO ==================== */
+        /* PASAJERO */
         .passenger-container { 
             display: flex; 
             flex-direction: column; 
             flex: 1;
             padding: 1rem;
             gap: 1rem;
-            overflow-y: auto;
         }
         
         .welcome-card {
@@ -164,18 +92,10 @@
             padding: 1.5rem;
             color: white;
             text-align: center;
-            box-shadow: var(--shadow-lg);
         }
         
-        .welcome-card h2 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .welcome-card p {
-            font-size: 0.9rem;
-            opacity: 0.95;
-        }
+        .welcome-card h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+        .welcome-card p { font-size: 0.9rem; opacity: 0.95; }
 
         .input-group {
             background: var(--white);
@@ -192,15 +112,8 @@
             font-size: 0.9rem;
             margin-bottom: 10px;
             outline: none;
-            transition: border-color 0.2s;
         }
-        .input-field:focus { 
-            border-color: var(--primary); 
-        }
-        
-        .input-field:last-child {
-            margin-bottom: 0;
-        }
+        .input-field:focus { border-color: var(--primary); }
 
         .btn-primary {
             width: 100%;
@@ -214,55 +127,27 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: all 0.2s;
             margin-top: 1rem;
             background: var(--secondary);
             color: white;
         }
         
-        .btn-primary:active { transform: scale(0.98); }
-        
-        .btn-secondary {
-            background: var(--white);
-            color: var(--secondary);
-            border: 2px solid var(--gray-200);
-        }
-        
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-        
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
+        .btn-secondary { background: var(--white); color: var(--secondary); border: 2px solid var(--gray-200); }
+        .btn-danger { background: var(--danger); color: white; }
 
         .status-card {
             background: var(--white);
             border-radius: 16px;
-            padding: 1.2rem;
-            box-shadow: var(--shadow);
+            padding: 1.5rem;
             text-align: center;
             display: none;
+            box-shadow: var(--shadow);
         }
-        
-        .status-card.active {
-            display: block;
-        }
-        
-        .status-icon {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .status-text {
-            font-weight: 600;
-            color: var(--gray-700);
-            margin-bottom: 1rem;
-        }
+        .status-card.active { display: block; }
+        .status-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .status-text { font-weight: 600; color: var(--gray-700); margin-bottom: 1rem; }
 
-        /* ==================== CHAT ==================== */
+        /* CHAT */
         .chat-container {
             display: flex;
             flex-direction: column;
@@ -277,7 +162,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: var(--shadow);
         }
         
         .chat-avatar {
@@ -292,31 +176,9 @@
             font-size: 1.3rem;
         }
         
-        .chat-info {
-            flex: 1;
-        }
-        
-        .chat-name {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--gray-900);
-        }
-        
-        .chat-status {
-            font-size: 0.75rem;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .chat-status::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background: var(--success);
-            border-radius: 50%;
-        }
+        .chat-info { flex: 1; }
+        .chat-name { font-weight: 700; font-size: 1rem; }
+        .chat-status { font-size: 0.75rem; color: var(--primary); }
 
         .chat-messages {
             flex: 1;
@@ -325,7 +187,6 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: #f9fafb;
         }
         
         .message {
@@ -333,9 +194,7 @@
             padding: 12px 16px;
             border-radius: 18px;
             font-size: 0.9rem;
-            line-height: 1.4;
             animation: slideIn 0.3s ease;
-            word-wrap: break-word;
         }
         
         @keyframes slideIn {
@@ -353,15 +212,8 @@
         .message.received {
             align-self: flex-start;
             background: var(--white);
-            color: var(--gray-900);
-            border-bottom-left-radius: 4px;
             box-shadow: var(--shadow);
-        }
-        
-        .message-time {
-            font-size: 0.7rem;
-            opacity: 0.7;
-            margin-top: 4px;
+            border-bottom-left-radius: 4px;
         }
 
         .chat-input-container {
@@ -371,7 +223,6 @@
             display: flex;
             gap: 10px;
             align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
         
         .chat-input {
@@ -381,11 +232,8 @@
             border-radius: 25px;
             font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s;
         }
-        .chat-input:focus {
-            border-color: var(--primary);
-        }
+        .chat-input:focus { border-color: var(--primary); }
         
         .chat-send {
             width: 48px;
@@ -399,61 +247,29 @@
             align-items: center;
             justify-content: center;
             font-size: 1.1rem;
-            transition: all 0.2s;
             flex-shrink: 0;
         }
-        .chat-send:hover {
-            background: var(--primary-dark);
-            transform: scale(1.05);
-        }
-        .chat-send:active {
-            transform: scale(0.95);
-        }
 
-        /* ==================== ADMIN/CONDUCTOR ==================== */
-        .requests-list {
-            padding: 1rem;
-            overflow-y: auto;
-            flex: 1;
-        }
+        /* ADMIN */
+        .requests-list { padding: 1rem; overflow-y: auto; flex: 1; }
         
         .request-card {
             background: var(--white);
             border-radius: 16px;
             padding: 1rem;
             margin-bottom: 1rem;
-            box-shadow: var(--shadow);
             border-left: 4px solid var(--primary);
+            box-shadow: var(--shadow);
         }
         
         .request-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             margin-bottom: 0.8rem;
         }
         
-        .request-title {
-            font-weight: 700;
-            color: var(--gray-900);
-        }
-        
-        .request-time {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-        }
-        
-        .request-info {
-            font-size: 0.85rem;
-            color: var(--gray-700);
-            margin-bottom: 0.5rem;
-        }
-        
-        .request-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 1rem;
-        }
+        .request-title { font-weight: 700; }
+        .request-info { font-size: 0.85rem; color: var(--gray-700); margin-bottom: 0.5rem; }
         
         .btn-small {
             flex: 1;
@@ -463,16 +279,14 @@
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
+            margin-top: 0.5rem;
         }
 
-        /* ==================== MODALES ==================== */
+        /* MODALES */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
             backdrop-filter: blur(4px);
             z-index: 2000;
             display: none;
@@ -480,10 +294,7 @@
             align-items: center;
             padding: 1rem;
         }
-        
-        .modal-overlay.active { 
-            display: flex; 
-        }
+        .modal-overlay.active { display: flex; }
         
         .modal-container {
             background: var(--white);
@@ -491,14 +302,6 @@
             max-width: 400px;
             border-radius: 20px;
             overflow: hidden;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: modalSlide 0.3s ease;
-        }
-        
-        @keyframes modalSlide {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         
         .modal-header {
@@ -509,50 +312,25 @@
             align-items: center;
         }
         
-        .modal-title { 
-            font-size: 1.2rem; 
-            font-weight: 700; 
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            color: var(--gray-500);
-            cursor: pointer;
-            padding: 4px;
-        }
-        
-        .modal-body { 
-            padding: 1.2rem; 
-        }
-        
+        .modal-title { font-size: 1.2rem; font-weight: 700; }
+        .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; }
+        .modal-body { padding: 1.2rem; }
         .modal-footer {
             padding: 1rem 1.2rem;
             border-top: 2px solid var(--gray-200);
             display: flex;
             gap: 10px;
         }
-        
-        .modal-footer .btn-primary { 
-            flex: 1; 
-            padding: 0.9rem;
-            margin-top: 0;
-        }
+        .modal-footer .btn-primary { flex: 1; margin-top: 0; }
 
-        /* ==================== UTILIDADES ==================== */
         .hidden { display: none !important; }
         .text-center { text-align: center; }
-        .mt-2 { margin-top: 1rem; }
         .mb-2 { margin-bottom: 1rem; }
 
         /* Loading */
         .loading {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg);
             display: flex;
             flex-direction: column;
@@ -561,50 +339,35 @@
             z-index: 3000;
         }
         .loading-spinner {
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             border: 4px solid var(--gray-200);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { 
-            margin-top: 1rem; 
-            color: var(--gray-700); 
-            font-weight: 600;
-        }
 
-        /* Responsive */
         @media (max-width: 480px) {
             .logo-text { font-size: 1.1rem; }
             .message { max-width: 85%; }
-            .btn-primary { padding: 0.9rem; font-size: 0.95rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Loading -->
     <div id="loadingScreen" class="loading">
         <div class="loading-spinner"></div>
-        <p class="loading-text">Cargando UberPinar...</p>
+        <p style="margin-top: 1rem; color: var(--gray-700); font-weight: 600;">Cargando...</p>
     </div>
 
-    <!-- Header -->
     <header>
         <div class="logo">
             <div class="logo-icon"></div>
             <div class="logo-text">Uber<span>Pinar</span></div>
         </div>
-        <div class="header-actions">
-            <span id="connectionStatus" class="status-badge local">
-                <i class="fa-solid fa-wifi"></i> Local
-            </span>
-            <button class="btn-icon" onclick="openRoleModal()">
-                <i class="fa-solid fa-user"></i>
-            </button>
-        </div>
+        <button class="btn-icon" onclick="openRoleModal()">
+            <i class="fa-solid fa-user"></i>
+        </button>
     </header>
 
     <!-- Vista Pasajero -->
@@ -612,7 +375,7 @@
         <div class="passenger-container">
             <div class="welcome-card">
                 <h2>🌿 Transporte Ecológico</h2>
-                <p>Viaja de forma sostenible con UberPinar</p>
+                <p>Viaja de forma sostenible</p>
             </div>
             
             <div class="input-group">
@@ -622,9 +385,9 @@
 
             <div id="statusCard" class="status-card">
                 <div class="status-icon" id="statusIcon">⏳</div>
-                <div class="status-text" id="statusText">Buscando conductor...</div>
+                <div class="status-text" id="statusText">Esperando confirmación...</div>
                 <button class="btn-primary btn-danger" onclick="cancelRide()">
-                    <i class="fa-solid fa-xmark"></i> Cancelar Viaje
+                    <i class="fa-solid fa-xmark"></i> Cancelar
                 </button>
             </div>
 
@@ -652,9 +415,7 @@
                 </div>
             </div>
             
-            <div class="chat-messages" id="chatMessages">
-                <!-- Mensajes aquí -->
-            </div>
+            <div class="chat-messages" id="chatMessages"></div>
             
             <div class="chat-input-container">
                 <input type="text" class="chat-input" id="chatInput" placeholder="Escribe un mensaje..." onkeypress="handleChatEnter(event)">
@@ -668,9 +429,7 @@
     <!-- Vista Admin -->
     <div id="viewAdmin" class="view">
         <div class="requests-list" id="adminRequests">
-            <p class="text-center" style="color: var(--gray-500); padding: 2rem;">
-                No hay solicitudes pendientes
-            </p>
+            <p class="text-center" style="color: var(--gray-500); padding: 2rem;">No hay solicitudes</p>
         </div>
     </div>
 
@@ -692,7 +451,7 @@
         </div>
     </div>
 
-    <!-- Modal Admin Login -->
+    <!-- Modal Admin -->
     <div id="adminLoginModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -700,9 +459,7 @@
                 <button class="modal-close" onclick="closeModal('adminLoginModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
-                <div class="input-field" style="margin-bottom: 0;">
-                    <input type="password" id="adminCode" placeholder="Código de seguridad" style="border: none; padding: 0;">
-                </div>
+                <input type="password" id="adminCode" class="input-field" placeholder="Código de seguridad">
             </div>
             <div class="modal-footer">
                 <button class="btn-primary btn-secondary" onclick="closeModal('adminLoginModal')">Cancelar</button>
@@ -711,32 +468,14 @@
         </div>
     </div>
 
-    <!-- Modal Notificación -->
-    <div id="notificationModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <span class="modal-title" id="notifTitle">Notificación</span>
-                <button class="modal-close" onclick="closeModal('notificationModal')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="modal-body">
-                <p id="notifMessage" style="color: var(--gray-700); line-height: 1.6;"></p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-primary" onclick="closeModal('notificationModal')">Entendido</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // ==================== CONFIGURACIÓN ====================
         const ADMIN_CODE = 'ADMIN2024';
         let currentRole = null;
         let currentRequestId = null;
         let currentChatId = null;
-        let useFirebase = false;
-        let db = null;
+        let bc = null;
 
-        // ==================== INICIALIZACIÓN ====================
+        // Inicialización
         window.onload = function() {
             setTimeout(() => {
                 document.getElementById('loadingScreen').style.display = 'none';
@@ -744,79 +483,44 @@
             }, 800);
             
             setupBroadcastChannel();
-            checkPendingRequests();
+            setInterval(checkUpdates, 1000);
         };
 
-        // ==================== BROADCAST CHANNEL (Comunicación entre tabs) ====================
-        let broadcastChannel = null;
-        
+        // Broadcast Channel (comunicación entre tabs)
         function setupBroadcastChannel() {
             if ('BroadcastChannel' in window) {
-                broadcastChannel = new BroadcastChannel('uberpinar_channel');
-                broadcastChannel.onmessage = function(event) {
-                    handleBroadcastMessage(event.data);
-                };
-                updateConnectionStatus('local');
-            } else {
-                // Fallback: polling localStorage
-                setInterval(checkLocalStorageUpdates, 1000);
-                updateConnectionStatus('local');
+                bc = new BroadcastChannel('uberpinar');
+                bc.onmessage = (e) => handleMessage(e.data);
             }
         }
 
-        function broadcastMessage(type, data) {
-            const message = { type, data, timestamp: Date.now() };
+        function broadcast(type, data) {
+            const msg = { type, data, time: Date.now() };
+            if (bc) bc.postMessage(msg);
             
-            if (broadcastChannel) {
-                broadcastChannel.postMessage(message);
-            }
-            
-            // Guardar en localStorage como fallback
-            const messages = JSON.parse(localStorage.getItem('uberpinar_messages') || '[]');
-            messages.push(message);
-            localStorage.setItem('uberpinar_messages', JSON.stringify(messages.slice(-50))); // Últimos 50 mensajes
+            // Fallback localStorage
+            const msgs = JSON.parse(localStorage.getItem('up_msgs') || '[]');
+            msgs.push(msg);
+            localStorage.setItem('up_msgs', JSON.stringify(msgs.slice(-100)));
         }
 
-        function handleBroadcastMessage(message) {
-            if (message.type === 'new_request' && currentRole === 'admin') {
-                addRequestToAdmin(message.data);
-            } else if (message.type === 'chat_message' && message.data.chatId === currentChatId) {
-                addMessageToChat(message.data.text, message.data.sender === currentRole ? 'sent' : 'received');
-            } else if (message.type === 'ride_accepted' && message.data.requestId === currentRequestId) {
-                onRideAccepted();
-            } else if (message.type === 'ride_cancelled' && message.data.requestId === currentRequestId) {
-                resetPassengerUI();
-                showNotification('Viaje Cancelado', 'El admin ha cancelado el viaje');
+        function handleMessage(msg) {
+            if (msg.type === 'request' && currentRole === 'admin') {
+                renderAdminRequests();
+            } else if (msg.type === 'chat' && msg.data.chatId === currentChatId) {
+                addMessage(msg.data.text, msg.data.from === currentRole ? 'sent' : 'received');
+            } else if (msg.type === 'accepted' && msg.data.id === currentRequestId) {
+                onAccepted();
+            } else if (msg.type === 'cancelled' && msg.data.id === currentRequestId) {
+                resetUI();
             }
         }
 
-        function checkLocalStorageUpdates() {
-            const messages = JSON.parse(localStorage.getItem('uberpinar_messages') || '[]');
-            const lastProcessed = parseInt(localStorage.getItem('uberpinar_last_processed') || '0');
-            
-            messages.forEach((msg, index) => {
-                if (index > lastProcessed) {
-                    handleBroadcastMessage(msg);
-                }
-            });
-            
-            if (messages.length > 0) {
-                localStorage.setItem('uberpinar_last_processed', (messages.length - 1).toString());
-            }
+        function checkUpdates() {
+            if (currentRole === 'admin') renderAdminRequests();
         }
 
-        function updateConnectionStatus(type) {
-            const statusEl = document.getElementById('connectionStatus');
-            if (type === 'online') {
-                statusEl.innerHTML = '<i class="fa-solid fa-check"></i> Online';
-                statusEl.className = 'status-badge online';
-            } else {
-                statusEl.innerHTML = '<i class="fa-solid fa-wifi"></i> Local';
-                statusEl.className = 'status-badge local';
-            }
-        }
-
-        // ==================== ROLES ====================
+        // Roles
         function openRoleModal() {
             document.getElementById('roleModal').classList.add('active');
         }
@@ -824,17 +528,14 @@
         function selectRole(role) {
             currentRole = role;
             closeModal('roleModal');
-            
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             
             if (role === 'passenger') {
                 document.getElementById('viewPassenger').classList.add('active');
-            } else if (role === 'admin') {
+            } else {
                 document.getElementById('viewAdmin').classList.add('active');
-                loadAdminRequests();
+                renderAdminRequests();
             }
-            
-            showNotification('Bienvenido', `Modo: ${role === 'passenger' ? 'Pasajero' : 'Administrador'}`);
         }
 
         function openAdminLogin() {
@@ -843,16 +544,15 @@
         }
 
         function verifyAdmin() {
-            const code = document.getElementById('adminCode').value;
-            if (code === ADMIN_CODE) {
+            if (document.getElementById('adminCode').value === ADMIN_CODE) {
                 closeModal('adminLoginModal');
                 selectRole('admin');
             } else {
-                showNotification('Error', 'Código incorrecto');
+                alert('Código incorrecto');
             }
         }
 
-        // ==================== PASAJERO - SOLICITAR VIAJE ====================
+        // Pasajero
         function requestRide() {
             const pickup = document.getElementById('pickupLocation').value || 'No especificado';
             const dropoff = document.getElementById('dropoffLocation').value || 'No especificado';
@@ -860,57 +560,35 @@
             currentRequestId = 'ride_' + Date.now();
             currentChatId = currentRequestId;
             
-            const requestData = {
-                requestId: currentRequestId,
-                pickup: pickup,
-                dropoff: dropoff,
-                timestamp: new Date().toLocaleString(),
-                passengerId: 'pass_' + Math.random().toString(36).substr(2, 6)
-            };
+            const req = { id: currentRequestId, pickup, dropoff, time: new Date().toLocaleString(), status: 'pending' };
             
-            // Broadcast a todos los tabs
-            broadcastMessage('new_request', requestData);
+            broadcast('request', req);
             
-            // Guardar en localStorage para admin
-            const requests = JSON.parse(localStorage.getItem('uberpinar_requests') || '[]');
-            requests.push({ ...requestData, status: 'pending' });
-            localStorage.setItem('uberpinar_requests', JSON.stringify(requests));
+            const reqs = JSON.parse(localStorage.getItem('up_requests') || '[]');
+            reqs.push(req);
+            localStorage.setItem('up_requests', JSON.stringify(reqs));
             
-            // Mostrar estado
             document.getElementById('statusCard').classList.add('active');
             document.getElementById('btnRequest').classList.add('hidden');
             
-            // Abrir chat automáticamente después de 1.5 segundos
             setTimeout(() => {
                 openChat();
-                addMessageToChat(`Hola, solicité un viaje. Recogida: ${pickup}. Destino: ${dropoff}`, 'sent');
+                addMessage(`Solicité un viaje. Recogida: ${pickup}. Destino: ${dropoff}`, 'sent');
             }, 1500);
-            
-            showNotification('Solicitud Enviada', 'El admin recibirá tu solicitud');
         }
 
         function cancelRide() {
-            broadcastMessage('ride_cancelled', { requestId: currentRequestId });
-            
-            const requests = JSON.parse(localStorage.getItem('uberpinar_requests') || '[]');
-            const req = requests.find(r => r.requestId === currentRequestId);
-            if (req) {
-                req.status = 'cancelled';
-                localStorage.setItem('uberpinar_requests', JSON.stringify(requests));
-            }
-            
-            resetPassengerUI();
-            showNotification('Cancelado', 'Viaje cancelado correctamente');
+            broadcast('cancelled', { id: currentRequestId });
+            resetUI();
         }
 
-        function onRideAccepted() {
+        function onAccepted() {
             document.getElementById('statusIcon').textContent = '✅';
             document.getElementById('statusText').textContent = '¡Viaje Confirmado!';
             document.getElementById('btnChat').classList.remove('hidden');
-            showNotification('¡Aceptado!', 'El admin confirmó tu viaje');
         }
 
-        function resetPassengerUI() {
+        function resetUI() {
             currentRequestId = null;
             currentChatId = null;
             document.getElementById('statusCard').classList.remove('active');
@@ -920,14 +598,14 @@
             document.getElementById('dropoffLocation').value = '';
         }
 
-        // ==================== ADMIN - SOLICITUDES ====================
-        function loadAdminRequests() {
+        // Admin
+        function renderAdminRequests() {
             const container = document.getElementById('adminRequests');
-            const requests = JSON.parse(localStorage.getItem('uberpinar_requests') || '[]');
-            const pending = requests.filter(r => r.status === 'pending');
+            const reqs = JSON.parse(localStorage.getItem('up_requests') || '[]');
+            const pending = reqs.filter(r => r.status === 'pending');
             
             if (pending.length === 0) {
-                container.innerHTML = '<p class="text-center" style="color: var(--gray-500); padding: 2rem;">No hay solicitudes pendientes</p>';
+                container.innerHTML = '<p class="text-center" style="color: var(--gray-500); padding: 2rem;">No hay solicitudes</p>';
                 return;
             }
             
@@ -938,161 +616,111 @@
                 card.innerHTML = `
                     <div class="request-header">
                         <div class="request-title">🚖 Nuevo Viaje</div>
-                        <div class="request-time">${req.timestamp}</div>
+                        <div style="font-size:0.75rem;color:var(--gray-500)">${req.time}</div>
                     </div>
-                    <div class="request-info">📍 Recogida: ${req.pickup}</div>
-                    <div class="request-info">🏁 Destino: ${req.dropoff}</div>
-                    <div class="request-actions">
-                        <button class="btn-small btn-primary" onclick="acceptRequest('${req.requestId}')">
-                            <i class="fa-solid fa-check"></i> Aceptar
-                        </button>
-                        <button class="btn-small btn-danger" onclick="rejectRequest('${req.requestId}')">
-                            <i class="fa-solid fa-xmark"></i> Rechazar
-                        </button>
-                    </div>
+                    <div class="request-info">📍 ${req.pickup}</div>
+                    <div class="request-info">🏁 ${req.dropoff}</div>
+                    <button class="btn-small btn-primary" onclick="acceptRequest('${req.id}')">
+                        <i class="fa-solid fa-check"></i> Aceptar
+                    </button>
+                    <button class="btn-small btn-danger" onclick="rejectRequest('${req.id}')" style="margin-top:5px">
+                        <i class="fa-solid fa-xmark"></i> Rechazar
+                    </button>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function acceptRequest(requestId) {
-            currentChatId = requestId;
+        function acceptRequest(id) {
+            currentChatId = id;
+            broadcast('accepted', { id });
             
-            broadcastMessage('ride_accepted', { requestId });
-            
-            const requests = JSON.parse(localStorage.getItem('uberpinar_requests') || '[]');
-            const req = requests.find(r => r.requestId === requestId);
+            const reqs = JSON.parse(localStorage.getItem('up_requests') || '[]');
+            const req = reqs.find(r => r.id === id);
             if (req) {
                 req.status = 'accepted';
-                localStorage.setItem('uberpinar_requests', JSON.stringify(requests));
+                localStorage.setItem('up_requests', JSON.stringify(reqs));
             }
             
             openChat();
-            addMessageToChat('Hola, soy el admin. Tu viaje ha sido confirmado. ¿En qué más puedo ayudarte?', 'received');
-            loadAdminRequests();
-            showNotification('Viaje Aceptado', 'Chat abierto con el pasajero');
+            addMessage('Hola, soy el admin. Tu viaje ha sido confirmado.', 'received');
+            renderAdminRequests();
         }
 
-        function rejectRequest(requestId) {
-            broadcastMessage('ride_cancelled', { requestId });
+        function rejectRequest(id) {
+            broadcast('cancelled', { id });
             
-            const requests = JSON.parse(localStorage.getItem('uberpinar_requests') || '[]');
-            const req = requests.find(r => r.requestId === requestId);
+            const reqs = JSON.parse(localStorage.getItem('up_requests') || '[]');
+            const req = reqs.find(r => r.id === id);
             if (req) {
                 req.status = 'rejected';
-                localStorage.setItem('uberpinar_requests', JSON.stringify(requests));
+                localStorage.setItem('up_requests', JSON.stringify(reqs));
             }
             
-            loadAdminRequests();
-            showNotification('Rechazado', 'Solicitud rechazada');
+            renderAdminRequests();
         }
 
-        function checkPendingRequests() {
-            if (currentRole === 'admin') {
-                loadAdminRequests();
-            }
-        }
-
-        // ==================== CHAT ====================
+        // Chat
         function openChat() {
-            if (!currentChatId && currentRole === 'passenger') {
-                currentChatId = 'general';
-            }
-            
+            if (!currentChatId && currentRole === 'passenger') currentChatId = 'general';
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('viewChat').classList.add('active');
-            
-            loadChatHistory();
+            loadChat();
         }
 
         function goBack() {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            
-            if (currentRole === 'passenger') {
-                document.getElementById('viewPassenger').classList.add('active');
-            } else if (currentRole === 'admin') {
-                document.getElementById('viewAdmin').classList.add('active');
-            }
+            if (currentRole === 'passenger') document.getElementById('viewPassenger').classList.add('active');
+            else document.getElementById('viewAdmin').classList.add('active');
         }
 
-        function handleChatEnter(event) {
-            if (event.key === 'Enter') sendChatMessage();
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') sendChatMessage();
         }
 
         function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
-            
             if (!text || !currentChatId) return;
             
-            const message = {
-                chatId: currentChatId,
-                text: text,
-                sender: currentRole,
-                timestamp: new Date().toLocaleTimeString()
-            };
+            const msg = { chatId: currentChatId, text, from: currentRole, time: new Date().toLocaleTimeString() };
+            broadcast('chat', msg);
             
-            // Broadcast
-            broadcastMessage('chat_message', message);
+            const msgs = JSON.parse(localStorage.getItem('up_chat_' + currentChatId) || '[]');
+            msgs.push(msg);
+            localStorage.setItem('up_chat_' + currentChatId, JSON.stringify(msgs));
             
-            // Guardar
-            const messages = JSON.parse(localStorage.getItem('uberpinar_chat_' + currentChatId) || '[]');
-            messages.push(message);
-            localStorage.setItem('uberpinar_chat_' + currentChatId, JSON.stringify(messages));
-            
-            addMessageToChat(text, 'sent');
+            addMessage(text, 'sent');
             input.value = '';
         }
 
-        function addMessageToChat(text, type) {
+        function addMessage(text, type) {
             const container = document.getElementById('chatMessages');
             const div = document.createElement('div');
             div.className = `message ${type}`;
-            div.innerHTML = `
-                ${text}
-                <div class="message-time">${new Date().toLocaleTimeString()}</div>
-            `;
+            div.textContent = text;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
 
-        function loadChatHistory() {
+        function loadChat() {
             if (!currentChatId) return;
-            
             const container = document.getElementById('chatMessages');
             container.innerHTML = '';
-            
-            const messages = JSON.parse(localStorage.getItem('uberpinar_chat_' + currentChatId) || '[]');
-            messages.forEach(msg => {
-                addMessageToChat(msg.text, msg.sender === currentRole ? 'sent' : 'received');
-            });
+            const msgs = JSON.parse(localStorage.getItem('up_chat_' + currentChatId) || '[]');
+            msgs.forEach(m => addMessage(m.text, m.from === currentRole ? 'sent' : 'received'));
         }
 
-        // ==================== MODALES ====================
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
+        // Modales
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
         }
 
-        function showNotification(title, message) {
-            document.getElementById('notifTitle').textContent = title;
-            document.getElementById('notifMessage').textContent = message;
-            document.getElementById('notificationModal').classList.add('active');
-        }
-
-        // Cerrar modales al hacer click fuera
-        document.querySelectorAll('.modal-overlay').forEach(modal => {
-            modal.addEventListener('click', function(e) {
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            m.addEventListener('click', function(e) {
                 if (e.target === this) closeModal(this.id);
             });
         });
-
-        // Limpiar mensajes antiguos cada 5 minutos
-        setInterval(() => {
-            const messages = JSON.parse(localStorage.getItem('uberpinar_messages') || '[]');
-            const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
-            const recent = messages.filter(m => m.timestamp > fiveMinutesAgo);
-            localStorage.setItem('uberpinar_messages', JSON.stringify(recent));
-        }, 60000);
     </script>
 </body>
 </html>
