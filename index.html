@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="UberPinar - Sistema de transporte inteligente">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>UberPinar | Transporte Inteligente</title>
     
     <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Leaflet Maps (Gratis, sin API Key) -->
+    <!-- Leaflet Maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- MQTT para comunicación en tiempo real -->
+    <!-- MQTT -->
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <style>
@@ -500,9 +506,40 @@
 
         /* Mapa Leaflet custom */
         .leaflet-container { font-family: 'Inter', sans-serif; }
+
+        /* Loading State */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { margin-top: 1rem; color: var(--gray-500); }
     </style>
 </head>
 <body>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Cargando UberPinar...</p>
+    </div>
 
     <!-- ==================== HEADER ==================== -->
     <header>
@@ -791,57 +828,66 @@
 
         // ==================== INICIALIZACIÓN ====================
         document.addEventListener('DOMContentLoaded', function() {
+            // Ocultar loading después de 1 segundo
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+            }, 1000);
+            
             connectMQTT();
             loadVehiclesFromStorage();
-            openRoleModal();
+            
+            // Mostrar modal de rol después de cargar
+            setTimeout(() => {
+                openRoleModal();
+            }, 1200);
         });
 
         function connectMQTT() {
             const statusEl = document.getElementById('connectionStatus');
             statusEl.innerHTML = '<i class="fa-solid fa-wifi"></i> Conectando...';
             
-            mqttClient = mqtt.connect(`wss://${MQTT_CONFIG.host}:${MQTT_CONFIG.port}${MQTT_CONFIG.path}`, MQTT_CONFIG.options);
+            try {
+                mqttClient = mqtt.connect(`wss://${MQTT_CONFIG.host}:${MQTT_CONFIG.port}${MQTT_CONFIG.path}`, MQTT_CONFIG.options);
 
-            mqttClient.on('connect', function() {
-                console.log('✅ Conectado a MQTT');
-                isConnected = true;
-                statusEl.innerHTML = '<i class="fa-solid fa-check"></i> Online';
-                statusEl.classList.remove('offline');
-                statusEl.classList.add('online');
-                
-                // Suscribirse a tópicos según rol
-                subscribeToTopics();
-            });
+                mqttClient.on('connect', function() {
+                    console.log('✅ Conectado a MQTT');
+                    isConnected = true;
+                    statusEl.innerHTML = '<i class="fa-solid fa-check"></i> Online';
+                    statusEl.classList.remove('offline');
+                    statusEl.classList.add('online');
+                    subscribeToTopics();
+                });
 
-            mqttClient.on('error', function(err) {
-                console.error('❌ Error MQTT:', err);
+                mqttClient.on('error', function(err) {
+                    console.error('❌ Error MQTT:', err);
+                    statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error';
+                });
+
+                mqttClient.on('close', function() {
+                    isConnected = false;
+                    statusEl.innerHTML = '<i class="fa-solid fa-wifi"></i> Offline';
+                    statusEl.classList.remove('online');
+                    statusEl.classList.add('offline');
+                });
+
+                mqttClient.on('message', function(topic, message) {
+                    handleMQTTMessage(topic, message.toString());
+                });
+            } catch (e) {
+                console.error('Error conectando MQTT:', e);
                 statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error';
-            });
-
-            mqttClient.on('close', function() {
-                isConnected = false;
-                statusEl.innerHTML = '<i class="fa-solid fa-wifi"></i> Offline';
-                statusEl.classList.remove('online');
-                statusEl.classList.add('offline');
-            });
-
-            mqttClient.on('message', function(topic, message) {
-                handleMQTTMessage(topic, message.toString());
-            });
+            }
         }
 
         function subscribeToTopics() {
             if (!isConnected) return;
             
-            // Todos suscritos a vehículos
             mqttClient.subscribe(TOPICS.VEHICLES);
             
-            // Admin y Conductores escuchan solicitudes
             if (currentRole === 'admin' || currentRole === 'driver') {
                 mqttClient.subscribe(TOPICS.REQUESTS);
             }
             
-            // Si hay chat activo
             if (currentChatTopic) {
                 mqttClient.subscribe(currentChatTopic);
             }
@@ -852,7 +898,6 @@
             try {
                 const data = JSON.parse(payload);
                 
-                // Vehículos actualizados
                 if (topic === TOPICS.VEHICLES) {
                     if (data.action === 'sync') {
                         vehicles = data.vehicles || [];
@@ -862,7 +907,6 @@
                     }
                 }
                 
-                // Solicitudes de viaje
                 if (topic === TOPICS.REQUESTS) {
                     if (data.type === 'new_request' && (currentRole === 'admin' || currentRole === 'driver')) {
                         renderRequest(data);
@@ -876,7 +920,6 @@
                     }
                 }
                 
-                // Mensajes de chat
                 if (topic.startsWith(TOPICS.CHAT_PREFIX) && topic === currentChatTopic) {
                     addChatMessage(data.text, data.sender === currentRole ? 'sent' : 'received');
                 }
@@ -894,21 +937,18 @@
             currentRole = role;
             closeModal('roleModal');
             
-            // Ocultar todas las vistas
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             
-            // Mostrar vista correspondiente
             if (role === 'passenger') {
                 document.getElementById('viewPassenger').classList.add('active');
-                initPassengerMap();
+                setTimeout(() => initPassengerMap(), 100);
             } else if (role === 'driver') {
                 document.getElementById('viewDriver').classList.add('active');
-                initDriverMap();
+                setTimeout(() => initDriverMap(), 100);
                 renderDriverVehicles();
             } else if (role === 'admin') {
                 document.getElementById('viewAdmin').classList.add('active');
                 renderVehicleTable();
-                renderAdminRequests();
             }
             
             subscribeToTopics();
@@ -932,16 +972,17 @@
 
         // ==================== MAPAS (LEAFLET) ====================
         function initPassengerMap() {
-            if (passengerMap) return;
+            if (passengerMap) {
+                passengerMap.invalidateSize();
+                return;
+            }
             
-            // Coordenadas de Pinar del Río por defecto
             passengerMap = L.map('passengerMap').setView([22.4167, -83.6967], 13);
             
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap'
             }).addTo(passengerMap);
             
-            // Geolocalización
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const lat = position.coords.latitude;
@@ -953,10 +994,11 @@
                         .openPopup();
                     
                     document.getElementById('pickupLocation').value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                }, function(error) {
+                    console.log('Geolocalización no disponible:', error);
                 });
             }
             
-            // Click en mapa para seleccionar ubicación
             passengerMap.on('click', function(e) {
                 if (userMarker) passengerMap.removeLayer(userMarker);
                 userMarker = L.marker(e.latlng).addTo(passengerMap);
@@ -965,7 +1007,10 @@
         }
 
         function initDriverMap() {
-            if (driverMap) return;
+            if (driverMap) {
+                driverMap.invalidateSize();
+                return;
+            }
             
             driverMap = L.map('driverMap').setView([22.4167, -83.6967], 12);
             
@@ -973,7 +1018,6 @@
                 attribution: '© OpenStreetMap'
             }).addTo(driverMap);
             
-            // Marcadores de vehículos
             vehicles.forEach(v => {
                 if (v.status === 'available') {
                     L.marker([22.4167 + (Math.random() - 0.5) * 0.1, -83.6967 + (Math.random() - 0.5) * 0.1])
@@ -994,7 +1038,6 @@
             
             showNotification('Ruta Calculada', `De: ${pickup}\nA: ${dropoff}`);
             
-            // Simular línea de ruta
             if (routeLine) passengerMap.removeLayer(routeLine);
             if (userMarker) {
                 const latlngs = [
@@ -1201,7 +1244,6 @@
         function renderRequest(data) {
             const container = document.getElementById('adminRequestsList');
             
-            // Limpiar mensaje de vacío
             if (container.querySelector('p')) container.innerHTML = '';
             
             const card = document.createElement('div');
@@ -1217,10 +1259,6 @@
                 <button class="btn-accept" onclick="acceptRequest('${data.requestId}')">Aceptar</button>
             `;
             container.appendChild(card);
-        }
-
-        function renderAdminRequests() {
-            // Las solicitudes se renderizan vía MQTT
         }
 
         function acceptRequest(requestId) {
@@ -1260,8 +1298,10 @@
             
             if (currentRole === 'passenger') {
                 document.getElementById('viewPassenger').classList.add('active');
+                if (passengerMap) setTimeout(() => passengerMap.invalidateSize(), 100);
             } else if (currentRole === 'driver') {
                 document.getElementById('viewDriver').classList.add('active');
+                if (driverMap) setTimeout(() => driverMap.invalidateSize(), 100);
             } else if (currentRole === 'admin') {
                 document.getElementById('viewAdmin').classList.add('active');
             }
