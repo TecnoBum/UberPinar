@@ -7,21 +7,14 @@
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>UberPinar | Transporte Inteligente</title>
+    <title>UberPinar | Transporte</title>
     
-    <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Leaflet Maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- MQTT -->
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <style>
@@ -55,57 +48,68 @@
         
         body { 
             background: var(--bg); 
-            height: 100vh; 
+            min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
-            overflow: hidden; 
+            overflow-x: hidden;
         }
 
         /* ==================== HEADER ==================== */
         header { 
             background: var(--white); 
-            padding: 1rem 1.5rem; 
+            padding: 0.8rem 1rem; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             border-bottom: 1px solid var(--gray-200); 
             z-index: 100;
             box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
         }
         
         .logo { 
             font-weight: 800; 
-            font-size: 1.3rem; 
+            font-size: 1.2rem; 
             display: flex; 
             align-items: center; 
-            gap: 10px;
+            gap: 8px;
             color: var(--gray-900);
         }
         
         .logo i { color: var(--secondary); }
         
-        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .header-actions { display: flex; align-items: center; gap: 10px; }
         
         .status-badge { 
-            font-size: 0.7rem; 
-            padding: 4px 10px; 
-            border-radius: 20px; 
+            font-size: 0.65rem; 
+            padding: 3px 8px; 
+            border-radius: 12px; 
             font-weight: 600; 
             background: var(--gray-100); 
             color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .status-badge.online { background: #dcfce7; color: #166534; }
         .status-badge.offline { background: #fee2e2; color: #991b1b; }
+        .status-badge.connecting { background: #fef3c7; color: #92400e; }
         
         .btn-icon { 
             background: var(--gray-100); 
             border: none; 
-            font-size: 1.1rem; 
+            font-size: 1rem; 
             color: var(--gray-700); 
             cursor: pointer; 
-            padding: 10px; 
-            border-radius: 12px;
+            padding: 8px; 
+            border-radius: 10px;
             transition: all 0.2s;
+            min-width: 36px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn-icon:hover { background: var(--gray-200); }
         .btn-icon:active { transform: scale(0.95); }
@@ -115,62 +119,72 @@
             display: none; 
             flex: 1; 
             flex-direction: column; 
-            height: calc(100vh - 70px); 
+            min-height: calc(100vh - 60px); 
             overflow: hidden; 
         }
         .view.active { display: flex; }
 
         /* ==================== PASAJERO ==================== */
-        .passenger-container { display: flex; flex-direction: column; height: 100%; }
+        .passenger-container { 
+            display: flex; 
+            flex-direction: column; 
+            flex: 1;
+            overflow: hidden;
+        }
         
         .map-container { 
             flex: 1; 
             position: relative; 
-            min-height: 300px;
+            min-height: 250px;
+            display: none;
         }
-        #passengerMap { width: 100%; height: 100%; }
+        .map-container.visible { display: block; }
+        #passengerMap { width: 100%; height: 100%; min-height: 250px; }
         
         .search-overlay {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
+            top: 10px;
+            left: 10px;
+            right: 10px;
             background: var(--white);
             border-radius: var(--radius);
             box-shadow: var(--shadow-lg);
-            padding: 1rem;
+            padding: 0.8rem;
             z-index: 1000;
         }
         
         .search-input-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         
         .search-input {
-            flex: 1;
-            padding: 12px 15px;
+            width: 100%;
+            padding: 10px 12px;
             border: 1px solid var(--gray-200);
-            border-radius: 10px;
-            font-size: 0.9rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
             outline: none;
         }
         .search-input:focus { border-color: var(--secondary); }
         
         .search-btn {
+            width: 100%;
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0 20px;
-            border-radius: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
             cursor: pointer;
         }
 
         .ride-panel {
             background: var(--white);
             border-radius: var(--radius) var(--radius) 0 0;
-            padding: 1.5rem;
+            padding: 1rem;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
             z-index: 1000;
         }
@@ -179,15 +193,16 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 12px;
+            padding: 10px;
             background: var(--gray-100);
-            border-radius: 12px;
+            border-radius: 10px;
             margin-bottom: 1rem;
+            font-size: 0.85rem;
         }
         
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: var(--gray-300);
         }
@@ -198,80 +213,83 @@
 
         .btn-ride {
             width: 100%;
-            padding: 1rem;
+            padding: 0.9rem;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.2s;
+            margin-bottom: 8px;
         }
         
         .btn-ride.primary { background: var(--primary); color: white; }
         .btn-ride.secondary { background: var(--white); color: var(--primary); border: 1px solid var(--gray-200); }
         .btn-ride.danger { background: var(--danger); color: white; }
+        .btn-ride.info { background: var(--secondary); color: white; }
         .btn-ride:active { transform: scale(0.98); }
 
         /* ==================== CONDUCTOR ==================== */
-        .driver-container { display: flex; flex-direction: column; height: 100%; }
+        .driver-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
         
         .vehicle-list {
-            padding: 1rem;
+            padding: 0.8rem;
             background: var(--white);
             border-bottom: 1px solid var(--gray-200);
-            max-height: 200px;
+            max-height: 150px;
             overflow-y: auto;
         }
         
         .vehicle-card {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px;
+            gap: 10px;
+            padding: 10px;
             background: var(--gray-100);
-            border-radius: 12px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            margin-bottom: 8px;
         }
         
         .vehicle-icon {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             background: var(--white);
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: var(--secondary);
         }
         
-        .vehicle-info h4 { font-size: 0.9rem; margin-bottom: 4px; }
-        .vehicle-info p { font-size: 0.75rem; color: var(--gray-500); }
+        .vehicle-info h4 { font-size: 0.85rem; margin-bottom: 2px; }
+        .vehicle-info p { font-size: 0.7rem; color: var(--gray-500); }
         
         .vehicle-status {
             margin-left: auto;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.65rem;
             font-weight: 600;
         }
         .vehicle-status.available { background: #dcfce7; color: #166534; }
         .vehicle-status.busy { background: #fef3c7; color: #92400e; }
 
-        #driverMap { flex: 1; }
+        #driverMap { flex: 1; min-height: 300px; display: none; }
+        #driverMap.visible { display: block; }
 
         /* ==================== ADMIN ==================== */
-        .admin-container { padding: 1rem; overflow-y: auto; }
+        .admin-container { padding: 0.8rem; overflow-y: auto; flex: 1; }
         
         .admin-section {
             background: var(--white);
             border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
             box-shadow: var(--shadow-sm);
         }
         
@@ -279,45 +297,47 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         
-        .section-title { font-size: 1.1rem; font-weight: 700; }
+        .section-title { font-size: 1rem; font-weight: 700; }
         
         .btn-add {
             background: var(--secondary);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
 
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.8rem;
         }
         
         .data-table th, .data-table td {
-            padding: 12px;
+            padding: 8px;
             text-align: left;
             border-bottom: 1px solid var(--gray-200);
         }
         
-        .data-table th { font-size: 0.75rem; color: var(--gray-500); font-weight: 600; text-transform: uppercase; }
-        .data-table td { font-size: 0.9rem; }
+        .data-table th { font-size: 0.65rem; color: var(--gray-500); font-weight: 600; text-transform: uppercase; }
         
         .btn-action {
-            padding: 6px 12px;
+            padding: 4px 8px;
             border: none;
-            border-radius: 8px;
-            font-size: 0.8rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
             cursor: pointer;
-            margin-right: 5px;
+            margin-right: 4px;
         }
         .btn-action.edit { background: var(--gray-100); color: var(--gray-700); }
         .btn-action.delete { background: #fee2e2; color: var(--danger); }
@@ -335,68 +355,59 @@
             display: none;
             justify-content: center;
             align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            padding: 1rem;
         }
         
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
+        .modal-overlay.active { display: flex; }
         
         .modal-container {
             background: var(--white);
-            width: 90%;
-            max-width: 400px;
+            width: 100%;
+            max-width: 380px;
             border-radius: 20px;
             overflow: hidden;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-            box-shadow: var(--shadow-lg);
-        }
-        
-        .modal-overlay.active .modal-container {
-            transform: scale(1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .modal-header {
-            padding: 1.5rem;
+            padding: 1rem 1.2rem;
             border-bottom: 1px solid var(--gray-200);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
-        .modal-title { font-size: 1.2rem; font-weight: 700; }
+        .modal-title { font-size: 1.1rem; font-weight: 700; }
         
         .modal-close {
             background: none;
             border: none;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--gray-500);
             cursor: pointer;
-            padding: 5px;
+            padding: 4px;
         }
         
-        .modal-body { padding: 1.5rem; }
+        .modal-body { padding: 1.2rem; }
         
         .modal-footer {
-            padding: 1.5rem;
+            padding: 1rem 1.2rem;
             border-top: 1px solid var(--gray-200);
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
         
-        .modal-footer .btn-ride { flex: 1; }
+        .modal-footer .btn-ride { flex: 1; padding: 0.8rem; font-size: 0.9rem; }
 
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--gray-700); }
+        .form-group { margin-bottom: 0.8rem; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: var(--gray-700); }
         .form-group input, .form-group select {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid var(--gray-200);
-            border-radius: 10px;
-            font-size: 0.95rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
             outline: none;
         }
         .form-group input:focus, .form-group select:focus { border-color: var(--secondary); }
@@ -405,46 +416,47 @@
         .chat-view { display: flex; flex-direction: column; height: 100%; background: var(--bg); }
         
         .chat-header {
-            padding: 1rem 1.5rem;
+            padding: 0.8rem 1rem;
             background: var(--white);
             border-bottom: 1px solid var(--gray-200);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
         
         .chat-avatar {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             background: var(--secondary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
         
-        .chat-info h4 { font-size: 1rem; margin-bottom: 3px; }
-        .chat-info span { font-size: 0.75rem; color: var(--success); display: flex; align-items: center; gap: 5px; }
-        .chat-info span::before { content: ''; width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
+        .chat-info h4 { font-size: 0.9rem; margin-bottom: 2px; }
+        .chat-info span { font-size: 0.7rem; color: var(--success); display: flex; align-items: center; gap: 4px; }
+        .chat-info span::before { content: ''; width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
 
         .chat-messages {
             flex: 1;
-            padding: 1rem 1.5rem;
+            padding: 1rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         
         .chat-message {
-            max-width: 75%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            font-size: 0.9rem;
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 0.85rem;
             line-height: 1.4;
             animation: slideUp 0.3s ease;
+            word-wrap: break-word;
         }
         
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -465,27 +477,27 @@
         }
         
         .chat-input-area {
-            padding: 1rem 1.5rem;
+            padding: 0.8rem 1rem;
             background: var(--white);
             border-top: 1px solid var(--gray-200);
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         
         .chat-input {
             flex: 1;
-            padding: 12px 18px;
+            padding: 10px 14px;
             border: 1px solid var(--gray-200);
-            border-radius: 25px;
-            font-size: 0.95rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
             outline: none;
         }
         .chat-input:focus { border-color: var(--secondary); }
         
         .chat-send {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: none;
             background: var(--primary);
@@ -494,20 +506,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
         }
-        .chat-send:hover { background: var(--gray-900); }
 
         /* ==================== UTILIDADES ==================== */
         .hidden { display: none !important; }
         .text-center { text-align: center; }
-        .mt-2 { margin-top: 1rem; }
-        .mb-2 { margin-bottom: 1rem; }
-
-        /* Mapa Leaflet custom */
+        .mt-2 { margin-top: 0.8rem; }
+        .mb-2 { margin-bottom: 0.8rem; }
         .leaflet-container { font-family: 'Inter', sans-serif; }
 
-        /* Loading State */
+        /* Loading */
         .loading {
             position: fixed;
             top: 0;
@@ -522,15 +530,23 @@
             z-index: 3000;
         }
         .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid var(--gray-200);
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-200);
             border-top-color: var(--secondary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { margin-top: 1rem; color: var(--gray-500); }
+        .loading-text { margin-top: 0.8rem; color: var(--gray-500); font-size: 0.9rem; }
+
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            .modal-container { border-radius: 16px 16px 0 0; max-height: 95vh; }
+            .btn-ride { padding: 0.8rem; font-size: 0.9rem; }
+            .search-overlay { top: 8px; left: 8px; right: 8px; padding: 0.6rem; }
+            .ride-panel { padding: 0.8rem; }
+        }
     </style>
 </head>
 <body>
@@ -541,15 +557,15 @@
         <p class="loading-text">Cargando UberPinar...</p>
     </div>
 
-    <!-- ==================== HEADER ==================== -->
+    <!-- Header -->
     <header>
         <div class="logo">
             <i class="fa-solid fa-car-side"></i>
             <span>UberPinar</span>
         </div>
         <div class="header-actions">
-            <span id="connectionStatus" class="status-badge offline">
-                <i class="fa-solid fa-wifi"></i> Offline
+            <span id="connectionStatus" class="status-badge connecting">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Conectando
             </span>
             <button class="btn-icon" onclick="openRoleModal()">
                 <i class="fa-solid fa-user"></i>
@@ -557,25 +573,27 @@
         </div>
     </header>
 
-    <!-- ==================== VISTA PASAJERO ==================== -->
+    <!-- Vista Pasajero -->
     <div id="viewPassenger" class="view">
         <div class="passenger-container">
-            <div class="map-container">
+            <div class="map-container" id="mapContainer">
                 <div id="passengerMap"></div>
                 <div class="search-overlay">
                     <div class="search-input-group">
                         <input type="text" class="search-input" id="pickupLocation" placeholder="📍 Punto de recogida">
-                    </div>
-                    <div class="search-input-group">
                         <input type="text" class="search-input" id="dropoffLocation" placeholder="🏁 Destino">
                     </div>
                     <button class="search-btn" onclick="searchRoute()">
-                        <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                        <i class="fa-solid fa-magnifying-glass"></i> Buscar Ruta
                     </button>
                 </div>
             </div>
             
             <div class="ride-panel">
+                <button class="btn-ride info" onclick="toggleMap()">
+                    <i class="fa-solid fa-map"></i> <span id="mapBtnText">Ver Mapa</span>
+                </button>
+                
                 <div id="rideStatus" class="ride-status hidden">
                     <div class="status-dot" id="statusDot"></div>
                     <span id="statusText">Buscando conductor...</span>
@@ -585,7 +603,7 @@
                     <i class="fa-solid fa-bolt"></i> Solicitar Viaje
                 </button>
                 <button id="btnOpenChat" class="btn-ride secondary hidden" onclick="openChat()">
-                    <i class="fa-regular fa-comment-dots"></i> Chat con Conductor
+                    <i class="fa-regular fa-comment-dots"></i> Chat con Admin
                 </button>
                 <button id="btnCancelRide" class="btn-ride danger hidden" onclick="cancelRide()">
                     <i class="fa-solid fa-xmark"></i> Cancelar
@@ -594,62 +612,65 @@
         </div>
     </div>
 
-    <!-- ==================== VISTA CONDUCTOR ==================== -->
+    <!-- Vista Conductor -->
     <div id="viewDriver" class="view">
         <div class="driver-container">
             <div class="vehicle-list">
                 <div class="section-header">
                     <span class="section-title">Mis Vehículos</span>
-                    <span class="status-badge online" id="driverStatus">En Línea</span>
+                    <span class="status-badge online" id="driverStatus">
+                        <i class="fa-solid fa-check"></i> En Línea
+                    </span>
                 </div>
-                <div id="driverVehicleList">
-                    <!-- Vehículos cargados dinámicamente -->
-                </div>
+                <div id="driverVehicleList"></div>
             </div>
+            <button class="btn-ride info" style="margin: 0.8rem;" onclick="toggleDriverMap()">
+                <i class="fa-solid fa-map"></i> <span id="driverMapBtnText">Ver Mapa</span>
+            </button>
             <div id="driverMap"></div>
         </div>
     </div>
 
-    <!-- ==================== VISTA ADMIN ==================== -->
+    <!-- Vista Admin -->
     <div id="viewAdmin" class="view">
         <div class="admin-container">
-            <!-- Gestión de Vehículos -->
             <div class="admin-section">
                 <div class="section-header">
-                    <span class="section-title"><i class="fa-solid fa-car"></i> Flota de Vehículos</span>
+                    <span class="section-title"><i class="fa-solid fa-car"></i> Flota</span>
                     <button class="btn-add" onclick="openVehicleModal()">
                         <i class="fa-solid fa-plus"></i> Agregar
                     </button>
                 </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Placa</th>
-                            <th>Modelo</th>
-                            <th>Conductor</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="vehicleTableBody">
-                        <!-- Vehículos cargados dinámicamente -->
-                    </tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Placa</th>
+                                <th>Modelo</th>
+                                <th>Conductor</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicleTableBody"></tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- Solicitudes Activas -->
             <div class="admin-section">
                 <div class="section-header">
-                    <span class="section-title"><i class="fa-solid fa-clipboard-list"></i> Solicitudes Activas</span>
+                    <span class="section-title"><i class="fa-solid fa-clipboard-list"></i> Solicitudes</span>
                 </div>
                 <div id="adminRequestsList">
-                    <p class="text-center" style="color: var(--gray-500); padding: 2rem;">No hay solicitudes pendientes</p>
+                    <p class="text-center" style="color: var(--gray-500); padding: 1.5rem; font-size: 0.85rem;">
+                        No hay solicitudes pendientes
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ==================== VISTA CHAT ==================== -->
+    <!-- Vista Chat -->
     <div id="viewChat" class="view">
         <div class="chat-view">
             <div class="chat-header">
@@ -660,13 +681,11 @@
                     <i class="fa-solid fa-user"></i>
                 </div>
                 <div class="chat-info">
-                    <h4 id="chatUserName">Usuario</h4>
-                    <span>En línea</span>
+                    <h4 id="chatUserName">Admin</h4>
+                    <span><i class="fa-solid fa-circle" style="font-size: 6px;"></i> En línea</span>
                 </div>
             </div>
-            <div class="chat-messages" id="chatMessages">
-                <!-- Mensajes cargados dinámicamente -->
-            </div>
+            <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-area">
                 <input type="text" class="chat-input" id="chatInput" placeholder="Escribe un mensaje..." onkeypress="handleChatEnter(event)">
                 <button class="chat-send" onclick="sendChatMessage()">
@@ -676,9 +695,7 @@
         </div>
     </div>
 
-    <!-- ==================== MODALES ==================== -->
-    
-    <!-- Modal de Selección de Rol -->
+    <!-- Modal Rol -->
     <div id="roleModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -709,7 +726,7 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>Código de Seguridad</label>
-                    <input type="password" id="adminCodeInput" placeholder="Ingresa el código especial">
+                    <input type="password" id="adminCodeInput" placeholder="Ingresa el código">
                 </div>
             </div>
             <div class="modal-footer">
@@ -719,7 +736,7 @@
         </div>
     </div>
 
-    <!-- Modal Agregar/Editar Vehículo -->
+    <!-- Modal Vehículo -->
     <div id="vehicleModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -729,16 +746,16 @@
             <div class="modal-body">
                 <input type="hidden" id="vehicleEditId">
                 <div class="form-group">
-                    <label>Placa / Matrícula</label>
-                    <input type="text" id="vehiclePlate" placeholder="Ej: ABC-123">
+                    <label>Placa</label>
+                    <input type="text" id="vehiclePlate" placeholder="ABC-123">
                 </div>
                 <div class="form-group">
-                    <label>Modelo / Marca</label>
-                    <input type="text" id="vehicleModel" placeholder="Ej: Toyota Corolla 2022">
+                    <label>Modelo</label>
+                    <input type="text" id="vehicleModel" placeholder="Toyota 2022">
                 </div>
                 <div class="form-group">
-                    <label>Conductor Asignado</label>
-                    <input type="text" id="vehicleDriver" placeholder="Nombre del conductor">
+                    <label>Conductor</label>
+                    <input type="text" id="vehicleDriver" placeholder="Nombre">
                 </div>
                 <div class="form-group">
                     <label>Estado</label>
@@ -756,7 +773,7 @@
         </div>
     </div>
 
-    <!-- Modal de Notificación -->
+    <!-- Modal Notificación -->
     <div id="notificationModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -764,7 +781,7 @@
                 <button class="modal-close" onclick="closeModal('notificationModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
-                <p id="notifMessage" style="color: var(--gray-700); line-height: 1.6;"></p>
+                <p id="notifMessage" style="color: var(--gray-700); line-height: 1.5; font-size: 0.9rem;"></p>
             </div>
             <div class="modal-footer">
                 <button class="btn-ride primary" onclick="closeModal('notificationModal')">Entendido</button>
@@ -772,7 +789,7 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmación -->
+    <!-- Modal Confirmación -->
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
@@ -780,7 +797,7 @@
                 <button class="modal-close" onclick="closeModal('confirmModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
-                <p id="confirmMessage" style="color: var(--gray-700); line-height: 1.6;"></p>
+                <p id="confirmMessage" style="color: var(--gray-700); line-height: 1.5; font-size: 0.9rem;"></p>
             </div>
             <div class="modal-footer">
                 <button class="btn-ride secondary" onclick="closeModal('confirmModal')">Cancelar</button>
@@ -796,18 +813,17 @@
             port: 8884,
             path: '/mqtt',
             options: {
-                keepalive: 60,
+                keepalive: 30,
                 clientId: 'uberpinar_' + Math.random().toString(16).substr(2, 8),
                 protocolId: 'MQTT',
                 protocolVersion: 4,
                 clean: true,
-                reconnectPeriod: 1000,
-                connectTimeout: 30000,
+                reconnectPeriod: 2000,
+                connectTimeout: 15000,
                 rejectUnauthorized: false
             }
         };
 
-        // Tópicos
         const TOPICS = {
             REQUESTS: 'uberpinar/requests',
             VEHICLES: 'uberpinar/vehicles',
@@ -817,6 +833,8 @@
         // ==================== ESTADO GLOBAL ====================
         let mqttClient = null;
         let isConnected = false;
+        let connectionAttempts = 0;
+        let maxAttempts = 5;
         let currentRole = null;
         let currentRequestId = null;
         let currentChatTopic = null;
@@ -825,26 +843,25 @@
         let driverMap = null;
         let userMarker = null;
         let routeLine = null;
+        let mapVisible = false;
+        let driverMapVisible = false;
 
         // ==================== INICIALIZACIÓN ====================
         document.addEventListener('DOMContentLoaded', function() {
-            // Ocultar loading después de 1 segundo
             setTimeout(() => {
                 document.getElementById('loadingScreen').style.display = 'none';
-            }, 1000);
+            }, 800);
             
             connectMQTT();
             loadVehiclesFromStorage();
             
-            // Mostrar modal de rol después de cargar
             setTimeout(() => {
                 openRoleModal();
-            }, 1200);
+            }, 1000);
         });
 
         function connectMQTT() {
             const statusEl = document.getElementById('connectionStatus');
-            statusEl.innerHTML = '<i class="fa-solid fa-wifi"></i> Conectando...';
             
             try {
                 mqttClient = mqtt.connect(`wss://${MQTT_CONFIG.host}:${MQTT_CONFIG.port}${MQTT_CONFIG.path}`, MQTT_CONFIG.options);
@@ -852,35 +869,50 @@
                 mqttClient.on('connect', function() {
                     console.log('✅ Conectado a MQTT');
                     isConnected = true;
+                    connectionAttempts = 0;
                     statusEl.innerHTML = '<i class="fa-solid fa-check"></i> Online';
-                    statusEl.classList.remove('offline');
-                    statusEl.classList.add('online');
+                    statusEl.className = 'status-badge online';
                     subscribeToTopics();
                 });
 
                 mqttClient.on('error', function(err) {
                     console.error('❌ Error MQTT:', err);
-                    statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error';
+                    connectionAttempts++;
+                    if (connectionAttempts >= maxAttempts) {
+                        statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Offline';
+                        statusEl.className = 'status-badge offline';
+                        showNotification('Conexión', 'Modo offline activado. El chat local funcionará normalmente.');
+                    } else {
+                        statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Reintentando...';
+                        statusEl.className = 'status-badge connecting';
+                    }
                 });
 
                 mqttClient.on('close', function() {
                     isConnected = false;
                     statusEl.innerHTML = '<i class="fa-solid fa-wifi"></i> Offline';
-                    statusEl.classList.remove('online');
-                    statusEl.classList.add('offline');
+                    statusEl.className = 'status-badge offline';
                 });
 
                 mqttClient.on('message', function(topic, message) {
                     handleMQTTMessage(topic, message.toString());
                 });
+
+                mqttClient.on('reconnect', function() {
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Reconectando...';
+                    statusEl.className = 'status-badge connecting';
+                });
+
             } catch (e) {
                 console.error('Error conectando MQTT:', e);
                 statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error';
+                statusEl.className = 'status-badge offline';
+                isConnected = false;
             }
         }
 
         function subscribeToTopics() {
-            if (!isConnected) return;
+            if (!isConnected || !mqttClient) return;
             
             mqttClient.subscribe(TOPICS.VEHICLES);
             
@@ -893,18 +925,16 @@
             }
         }
 
-        // ==================== MANEJO DE MENSAJES MQTT ====================
+        // ==================== MANEJO DE MENSAJES ====================
         function handleMQTTMessage(topic, payload) {
             try {
                 const data = JSON.parse(payload);
                 
-                if (topic === TOPICS.VEHICLES) {
-                    if (data.action === 'sync') {
-                        vehicles = data.vehicles || [];
-                        saveVehiclesToStorage();
-                        if (currentRole === 'admin') renderVehicleTable();
-                        if (currentRole === 'driver') renderDriverVehicles();
-                    }
+                if (topic === TOPICS.VEHICLES && data.action === 'sync') {
+                    vehicles = data.vehicles || [];
+                    saveVehiclesToStorage();
+                    if (currentRole === 'admin') renderVehicleTable();
+                    if (currentRole === 'driver') renderDriverVehicles();
                 }
                 
                 if (topic === TOPICS.REQUESTS) {
@@ -915,7 +945,7 @@
                         onRideAccepted(data);
                     }
                     if (data.type === 'cancelled' && data.requestId === currentRequestId && currentRole === 'passenger') {
-                        showNotification('Viaje Cancelado', 'El conductor ha cancelado tu solicitud.');
+                        showNotification('Viaje Cancelado', 'El admin ha cancelado tu solicitud.');
                         resetPassengerUI();
                     }
                 }
@@ -924,11 +954,11 @@
                     addChatMessage(data.text, data.sender === currentRole ? 'sent' : 'received');
                 }
             } catch (e) {
-                console.error('Error parsing MQTT message:', e);
+                console.error('Error parsing MQTT:', e);
             }
         }
 
-        // ==================== GESTIÓN DE ROLES ====================
+        // ==================== ROLES ====================
         function openRoleModal() {
             document.getElementById('roleModal').classList.add('active');
         }
@@ -941,10 +971,8 @@
             
             if (role === 'passenger') {
                 document.getElementById('viewPassenger').classList.add('active');
-                setTimeout(() => initPassengerMap(), 100);
             } else if (role === 'driver') {
                 document.getElementById('viewDriver').classList.add('active');
-                setTimeout(() => initDriverMap(), 100);
                 renderDriverVehicles();
             } else if (role === 'admin') {
                 document.getElementById('viewAdmin').classList.add('active');
@@ -952,7 +980,7 @@
             }
             
             subscribeToTopics();
-            showNotification('Bienvenido', `Has iniciado sesión como ${role === 'passenger' ? 'Pasajero' : role === 'driver' ? 'Conductor' : 'Administrador'}`);
+            showNotification('Bienvenido', `Modo: ${role === 'passenger' ? 'Pasajero' : role === 'driver' ? 'Conductor' : 'Admin'}`);
         }
 
         function openAdminLogin() {
@@ -966,14 +994,50 @@
                 closeModal('adminLoginModal');
                 selectRole('admin');
             } else {
-                showNotification('Error', 'Código de administrador incorrecto.');
+                showNotification('Error', 'Código incorrecto.');
             }
         }
 
-        // ==================== MAPAS (LEAFLET) ====================
+        // ==================== MAPAS ====================
+        function toggleMap() {
+            const mapContainer = document.getElementById('mapContainer');
+            const btnText = document.getElementById('mapBtnText');
+            
+            mapVisible = !mapVisible;
+            
+            if (mapVisible) {
+                mapContainer.classList.add('visible');
+                btnText.textContent = 'Ocultar Mapa';
+                setTimeout(() => {
+                    initPassengerMap();
+                }, 100);
+            } else {
+                mapContainer.classList.remove('visible');
+                btnText.textContent = 'Ver Mapa';
+            }
+        }
+
+        function toggleDriverMap() {
+            const driverMapEl = document.getElementById('driverMap');
+            const btnText = document.getElementById('driverMapBtnText');
+            
+            driverMapVisible = !driverMapVisible;
+            
+            if (driverMapVisible) {
+                driverMapEl.classList.add('visible');
+                btnText.textContent = 'Ocultar Mapa';
+                setTimeout(() => {
+                    initDriverMap();
+                }, 100);
+            } else {
+                driverMapEl.classList.remove('visible');
+                btnText.textContent = 'Ver Mapa';
+            }
+        }
+
         function initPassengerMap() {
             if (passengerMap) {
-                passengerMap.invalidateSize();
+                setTimeout(() => passengerMap.invalidateSize(), 100);
                 return;
             }
             
@@ -990,12 +1054,12 @@
                     passengerMap.setView([lat, lng], 15);
                     
                     userMarker = L.marker([lat, lng]).addTo(passengerMap)
-                        .bindPopup('📍 Tu ubicación actual')
+                        .bindPopup('📍 Tu ubicación')
                         .openPopup();
                     
                     document.getElementById('pickupLocation').value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                }, function(error) {
-                    console.log('Geolocalización no disponible:', error);
+                }, function() {
+                    console.log('Geolocalización no disponible');
                 });
             }
             
@@ -1008,7 +1072,7 @@
 
         function initDriverMap() {
             if (driverMap) {
-                driverMap.invalidateSize();
+                setTimeout(() => driverMap.invalidateSize(), 100);
                 return;
             }
             
@@ -1017,49 +1081,34 @@
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap'
             }).addTo(driverMap);
-            
-            vehicles.forEach(v => {
-                if (v.status === 'available') {
-                    L.marker([22.4167 + (Math.random() - 0.5) * 0.1, -83.6967 + (Math.random() - 0.5) * 0.1])
-                        .addTo(driverMap)
-                        .bindPopup(`🚗 ${v.model} - ${v.plate}`);
-                }
-            });
         }
 
         function searchRoute() {
             const pickup = document.getElementById('pickupLocation').value;
             const dropoff = document.getElementById('dropoffLocation').value;
             
-            if (!pickup || !dropoff) {
-                showNotification('Error', 'Por favor ingresa punto de recogida y destino.');
+            if (!pickup) {
+                showNotification('Error', 'Selecciona punto de recogida.');
                 return;
             }
             
-            showNotification('Ruta Calculada', `De: ${pickup}\nA: ${dropoff}`);
+            showNotification('Ruta', `De: ${pickup}\nA: ${dropoff || 'No especificado'}`);
             
-            if (routeLine) passengerMap.removeLayer(routeLine);
-            if (userMarker) {
-                const latlngs = [
-                    userMarker.getLatLng(),
-                    [userMarker.getLatLng().lat + 0.01, userMarker.getLatLng().lng + 0.01]
-                ];
-                routeLine = L.polyline(latlngs, {color: 'blue', weight: 4}).addTo(passengerMap);
-                passengerMap.fitBounds(routeLine.getBounds());
-            }
+            if (!mapVisible) toggleMap();
         }
 
-        // ==================== PASAJERO - SOLICITUD DE VIAJE ====================
+        // ==================== PASAJERO ====================
         function requestRide() {
             const pickup = document.getElementById('pickupLocation').value;
             const dropoff = document.getElementById('dropoffLocation').value;
             
             if (!pickup) {
-                showNotification('Error', 'Selecciona un punto de recogida en el mapa.');
+                showNotification('Error', 'Selecciona punto de recogida en el mapa.');
                 return;
             }
             
             currentRequestId = 'ride_' + Date.now();
+            currentChatTopic = TOPICS.CHAT_PREFIX + currentRequestId;
             
             const requestData = {
                 type: 'new_request',
@@ -1070,39 +1119,45 @@
                 passengerId: 'pass_' + Math.random().toString(36).substr(2, 6)
             };
             
-            mqttClient.publish(TOPICS.REQUESTS, JSON.stringify(requestData));
+            if (isConnected && mqttClient) {
+                mqttClient.publish(TOPICS.REQUESTS, JSON.stringify(requestData));
+                mqttClient.subscribe(currentChatTopic);
+            }
             
             document.getElementById('rideStatus').classList.remove('hidden');
             document.getElementById('statusDot').className = 'status-dot pending';
-            document.getElementById('statusText').textContent = 'Buscando conductor disponible...';
+            document.getElementById('statusText').textContent = 'Esperando confirmación del admin...';
             document.getElementById('btnRequestRide').classList.add('hidden');
             document.getElementById('btnCancelRide').classList.remove('hidden');
             
-            showNotification('Solicitud Enviada', 'Tu viaje está siendo buscado por conductores cercanos.');
+            // Abrir chat automáticamente después de 1 segundo
+            setTimeout(() => {
+                openChat();
+                addChatMessage('Hola, he solicitado un viaje. Mi recogida es en: ' + pickup, 'sent');
+            }, 1000);
+            
+            showNotification('Solicitud Enviada', 'El admin recibirá tu solicitud.');
         }
 
         function cancelRide() {
-            showConfirmModal('Cancelar Viaje', '¿Estás seguro de que deseas cancelar esta solicitud?', function() {
-                if (currentRequestId) {
+            showConfirmModal('Cancelar Viaje', '¿Cancelar esta solicitud?', function() {
+                if (currentRequestId && isConnected && mqttClient) {
                     mqttClient.publish(TOPICS.REQUESTS, JSON.stringify({
                         type: 'cancelled',
                         requestId: currentRequestId
                     }));
-                    resetPassengerUI();
                 }
+                resetPassengerUI();
             });
         }
 
         function onRideAccepted(data) {
             document.getElementById('statusDot').className = 'status-dot active';
-            document.getElementById('statusText').textContent = `Conductor: ${data.driverName || 'Asignado'}`;
+            document.getElementById('statusText').textContent = '✅ Viaje Confirmado';
             document.getElementById('btnCancelRide').classList.add('hidden');
             document.getElementById('btnOpenChat').classList.remove('hidden');
             
-            currentChatTopic = TOPICS.CHAT_PREFIX + currentRequestId;
-            mqttClient.subscribe(currentChatTopic);
-            
-            showNotification('¡Viaje Confirmado!', `Tu conductor está en camino.\nTiempo estimado: 5-10 min`);
+            showNotification('¡Viaje Confirmado!', 'El admin ha aceptado tu viaje.');
         }
 
         function resetPassengerUI() {
@@ -1123,7 +1178,7 @@
             const myVehicles = vehicles.filter(v => v.status !== 'maintenance');
             
             if (myVehicles.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:var(--gray-500);padding:1rem;">No hay vehículos asignados</p>';
+                container.innerHTML = '<p style="text-align:center;color:var(--gray-500);padding:1rem;font-size:0.85rem;">No hay vehículos</p>';
                 return;
             }
             
@@ -1142,13 +1197,13 @@
             });
         }
 
-        // ==================== ADMIN - GESTIÓN DE VEHÍCULOS ====================
+        // ==================== ADMIN ====================
         function renderVehicleTable() {
             const tbody = document.getElementById('vehicleTableBody');
             tbody.innerHTML = '';
             
             if (vehicles.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color:var(--gray-500);padding:2rem;">No hay vehículos registrados</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color:var(--gray-500);padding:1.5rem;">Sin vehículos</td></tr>';
                 return;
             }
             
@@ -1157,7 +1212,7 @@
                 tr.innerHTML = `
                     <td><strong>${v.plate}</strong></td>
                     <td>${v.model}</td>
-                    <td>${v.driver || 'Sin asignar'}</td>
+                    <td>${v.driver || '-'}</td>
                     <td><span class="vehicle-status ${v.status}">${v.status}</span></td>
                     <td>
                         <button class="btn-action edit" onclick="editVehicle(${index})"><i class="fa-solid fa-pen"></i></button>
@@ -1201,7 +1256,7 @@
             };
             
             if (!vehicle.plate || !vehicle.model) {
-                showNotification('Error', 'Placa y modelo son requeridos.');
+                showNotification('Error', 'Placa y modelo requeridos.');
                 return;
             }
             
@@ -1215,15 +1270,13 @@
             syncVehicles();
             renderVehicleTable();
             closeModal('vehicleModal');
-            showNotification('Éxito', 'Vehículo guardado correctamente.');
+            showNotification('Éxito', 'Vehículo guardado.');
         }
 
-        function editVehicle(index) {
-            openVehicleModal(index);
-        }
+        function editVehicle(index) { openVehicleModal(index); }
 
         function deleteVehicle(index) {
-            showConfirmModal('Eliminar Vehículo', `¿Estás seguro de eliminar el vehículo ${vehicles[index].plate}?`, function() {
+            showConfirmModal('Eliminar', `¿Eliminar ${vehicles[index].plate}?`, function() {
                 vehicles.splice(index, 1);
                 saveVehiclesToStorage();
                 syncVehicles();
@@ -1232,7 +1285,7 @@
         }
 
         function syncVehicles() {
-            if (isConnected) {
+            if (isConnected && mqttClient) {
                 mqttClient.publish(TOPICS.VEHICLES, JSON.stringify({
                     action: 'sync',
                     vehicles: vehicles
@@ -1240,7 +1293,7 @@
             }
         }
 
-        // ==================== ADMIN - SOLICITUDES ====================
+        // ==================== SOLICITUDES ADMIN ====================
         function renderRequest(data) {
             const container = document.getElementById('adminRequestsList');
             
@@ -1249,14 +1302,14 @@
             const card = document.createElement('div');
             card.className = 'request-card';
             card.id = `request-${data.requestId}`;
+            card.style.cssText = 'background:var(--white);padding:0.8rem;border-radius:10px;margin-bottom:0.6rem;border:1px solid var(--gray-200);display:flex;justify-content:space-between;align-items:center;';
             card.innerHTML = `
-                <div class="req-info">
-                    <h4>🚖 Nuevo Viaje</h4>
-                    <p>📍 ${data.pickup}</p>
-                    <p>🏁 ${data.dropoff}</p>
-                    <p>⏰ ${data.timestamp}</p>
+                <div style="font-size:0.85rem;">
+                    <div style="font-weight:600;margin-bottom:4px;">🚖 Nuevo Viaje</div>
+                    <div style="color:var(--gray-500);font-size:0.75rem;">📍 ${data.pickup}</div>
+                    <div style="color:var(--gray-500);font-size:0.75rem;">⏰ ${data.timestamp}</div>
                 </div>
-                <button class="btn-accept" onclick="acceptRequest('${data.requestId}')">Aceptar</button>
+                <button class="btn-accept" onclick="acceptRequest('${data.requestId}')" style="background:var(--secondary);color:white;border:none;padding:6px 12px;border-radius:8px;font-size:0.75rem;cursor:pointer;">Aceptar</button>
             `;
             container.appendChild(card);
         }
@@ -1268,29 +1321,36 @@
             const acceptData = {
                 type: 'accepted',
                 requestId: requestId,
-                driverName: 'Conductor UberPinar',
+                driverName: 'Admin UberPinar',
                 timestamp: new Date().toLocaleString()
             };
             
-            mqttClient.publish(TOPICS.REQUESTS, JSON.stringify(acceptData));
+            if (isConnected && mqttClient) {
+                mqttClient.publish(TOPICS.REQUESTS, JSON.stringify(acceptData));
+            }
             
             currentChatTopic = TOPICS.CHAT_PREFIX + requestId;
-            mqttClient.subscribe(currentChatTopic);
+            if (isConnected && mqttClient) {
+                mqttClient.subscribe(currentChatTopic);
+            }
             
             openChat();
-            showNotification('Viaje Aceptado', 'Te has conectado al chat con el pasajero.');
+            showNotification('Viaje Aceptado', 'Chat abierto con el pasajero.');
         }
 
         // ==================== CHAT ====================
         function openChat() {
-            if (!currentChatTopic) {
-                showNotification('Error', 'No hay chat activo.');
-                return;
+            if (!currentChatTopic && currentRole === 'passenger') {
+                currentChatTopic = TOPICS.CHAT_PREFIX + 'admin_general';
             }
             
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('viewChat').classList.add('active');
-            document.getElementById('chatUserName').textContent = currentRole === 'passenger' ? 'Conductor' : 'Pasajero';
+            document.getElementById('chatUserName').textContent = currentRole === 'passenger' ? 'Admin' : 'Pasajero';
+            
+            if (isConnected && mqttClient && currentChatTopic) {
+                mqttClient.subscribe(currentChatTopic);
+            }
         }
 
         function goBack() {
@@ -1298,10 +1358,8 @@
             
             if (currentRole === 'passenger') {
                 document.getElementById('viewPassenger').classList.add('active');
-                if (passengerMap) setTimeout(() => passengerMap.invalidateSize(), 100);
             } else if (currentRole === 'driver') {
                 document.getElementById('viewDriver').classList.add('active');
-                if (driverMap) setTimeout(() => driverMap.invalidateSize(), 100);
             } else if (currentRole === 'admin') {
                 document.getElementById('viewAdmin').classList.add('active');
             }
@@ -1323,7 +1381,12 @@
                 timestamp: Date.now()
             };
             
-            mqttClient.publish(currentChatTopic, JSON.stringify(message));
+            if (isConnected && mqttClient) {
+                mqttClient.publish(currentChatTopic, JSON.stringify(message));
+            }
+            
+            // Guardar localmente para modo offline
+            saveChatMessageLocal(message);
             addChatMessage(text, 'sent');
             input.value = '';
         }
@@ -1335,6 +1398,20 @@
             div.textContent = text;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
+        }
+
+        function saveChatMessageLocal(message) {
+            const chatHistory = JSON.parse(localStorage.getItem('uberpinar_chat_' + currentChatTopic) || '[]');
+            chatHistory.push(message);
+            localStorage.setItem('uberpinar_chat_' + currentChatTopic, JSON.stringify(chatHistory));
+        }
+
+        function loadChatHistory() {
+            if (!currentChatTopic) return;
+            const chatHistory = JSON.parse(localStorage.getItem('uberpinar_chat_' + currentChatTopic) || '[]');
+            chatHistory.forEach(msg => {
+                addChatMessage(msg.text, msg.sender === currentRole ? 'sent' : 'received');
+            });
         }
 
         // ==================== MODALES ====================
@@ -1359,7 +1436,7 @@
             };
         }
 
-        // ==================== ALMACENAMIENTO LOCAL ====================
+        // ==================== ALMACENAMIENTO ====================
         function loadVehiclesFromStorage() {
             const stored = localStorage.getItem('uberpinar_vehicles');
             if (stored) {
